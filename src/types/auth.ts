@@ -8,6 +8,7 @@ export interface UserData {
 export interface LoginCredentials {
   email: string;
   password: string;
+  role: string;
 }
 
 export interface LoginResponse {
@@ -20,6 +21,7 @@ export interface RegisterCredentials {
   first_name: string;
   last_name: string;
   password: string;
+  role: string;
 }
 
 export interface RegisterResponse {
