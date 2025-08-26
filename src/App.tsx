@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PrivateRoute from "./layouts/PrivateRoute";
 import AdminPortal from "./pages/AdminPortal";
+import PlanMaker from "./pages/PlanMaker";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="register" element={<Register />} />
           <Route element={<PrivateRoute />}>
             <Route path="portal" element={<AdminPortal />} />
+            <Route path="planner" element={<PlanMaker />} />
           </Route>
           <Route path="*" element={<Navigate to="/portal" replace />} />
         </Routes>
