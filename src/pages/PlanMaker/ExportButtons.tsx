@@ -1,5 +1,5 @@
 import { Button } from '../../components/Button';
-import { Printer, Save } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import type { StudyPlan } from '../../types/plan';
 
 interface ExportButtonsProps {
