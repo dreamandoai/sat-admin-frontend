@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/Card';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
@@ -7,25 +7,20 @@ import { Slider } from '../../components/Slider';
 import { Badge } from '../../components/Badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/Select';
 import { Calendar, Clock, User } from 'lucide-react';
-import type { StudentProfile } from '../../lib/schemas';
-import { mockStudents } from '../../lib/mockData';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSelectedStudent } from '../../store/planSlice';
+import type { RootState } from '../../store';
+import type { StudentProfile, PlanRequest } from '../../types/plan';
 
 interface PlanControlsProps {
-  profile: StudentProfile;
-  onGeneratePlan: (config: {
-    startDate: string;
-    weeks: number;
-    capPerWeek: number;
-    sectionSplit: { RW: number; Math: number };
-    studentInfo: {
-      studentId: string;
-      studentName: string;
-    };
-  }) => void;
-  isGenerating?: boolean;
+  students: StudentProfile[];
+  onGeneratePlan: (config: PlanRequest) => void;
 }
 
-const PlanControls: React.FC<PlanControlsProps> = ({ profile, onGeneratePlan, isGenerating = false }: PlanControlsProps) => {
+const PlanControls: React.FC<PlanControlsProps> = ({ students, onGeneratePlan }: PlanControlsProps) => {
+  const dispatch = useDispatch();
+  const { selectedStudent } = useSelector((state: RootState) => state.plan);
+
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -33,9 +28,14 @@ const PlanControls: React.FC<PlanControlsProps> = ({ profile, onGeneratePlan, is
   const [weeks, setWeeks] = useState(3);
   const [capPerWeek, setCapPerWeek] = useState([360]);
   const [rwSplit, setRwSplit] = useState([50]);
-  
-  // Student selection state
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
+  
+  useEffect(() => {
+    if(selectedStudentId !== "") {
+      const temp = students.find((s: StudentProfile) => s.id === selectedStudentId);
+      temp && dispatch(setSelectedStudent(temp))
+    }
+  }, [selectedStudentId]);
 
   const handleGenerate = () => {
     const sectionSplit = {
@@ -43,21 +43,14 @@ const PlanControls: React.FC<PlanControlsProps> = ({ profile, onGeneratePlan, is
       Math: (100 - rwSplit[0]) / 100,
     };
 
-    const selectedStudent = mockStudents.find(s => s.id === selectedStudentId);
-
     onGeneratePlan({
-      startDate: startDate + 'T00:00:00.000Z',
+      student_id: selectedStudentId,
+      start_date: startDate + 'T00:00:00.000Z',
       weeks,
-      capPerWeek: capPerWeek[0],
-      sectionSplit,
-      studentInfo: {
-        studentId: selectedStudentId,
-        studentName: selectedStudent?.name || '',
-      },
+      cap_per_week: capPerWeek[0],
+      section_split: sectionSplit,
     });
   };
-
-  const canGenerate = selectedStudentId !== '';
 
   return (
     <Card className="bg-card border-border rounded-lg">
@@ -81,41 +74,41 @@ const PlanControls: React.FC<PlanControlsProps> = ({ profile, onGeneratePlan, is
                 <SelectValue placeholder="Choose a student" />
               </SelectTrigger>
               <SelectContent>
-                {mockStudents.map((student) => (
+                {students.map((student) => (
                   <SelectItem key={student.id} value={student.id}>
-                    {student.name}
+                    {student.first_name} {student.last_name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
-            <Clock className="h-4 w-4 text-primary" />
-            <span className="text-small text-foreground">{profile.sessionLengthMin} min sessions</span>
-          </div>
+          {selectedStudent && (
+            <div className="flex items-center gap-2 pt-2">
+              <Clock className="h-4 w-4 text-primary" />
+              <span className="text-small text-foreground">{selectedStudent.session_length_min} min sessions</span>
+            </div>
+          )}
         </div>
-
-        {/* Section Priorities */}
-        <div>
-          <Label className="mb-3 block font-medium text-foreground">Section Priorities</Label>
-          <div className="flex gap-3">
-            <Badge 
-              variant={profile.sectionPriority.RW >= 4 ? "default" : "secondary"}
-              className="text-small px-3 py-1 font-medium"
-            >
-              Reading & Writing: {profile.sectionPriority.RW}/5
-            </Badge>
-            <Badge 
-              variant={profile.sectionPriority.Math >= 4 ? "default" : "secondary"}
-              className="text-small px-3 py-1 font-medium"
-            >
-              Math: {profile.sectionPriority.Math}/5
-            </Badge>
+        {selectedStudent && (
+          <div>
+            <Label className="mb-3 block font-medium text-foreground">Section Priorities</Label>
+            <div className="flex gap-3">
+              <Badge 
+                variant={selectedStudent?.section_priority.RW >= 4 ? "default" : "secondary"}
+                className="text-small px-3 py-1 font-medium"
+              >
+                Reading & Writing: {selectedStudent.section_priority.RW}/5
+              </Badge>
+              <Badge 
+                variant={selectedStudent?.section_priority.Math >= 4 ? "default" : "secondary"}
+                className="text-small px-3 py-1 font-medium"
+              >
+                Math: {selectedStudent?.section_priority.Math}/5
+              </Badge>
+            </div>
           </div>
-        </div>
-
-        {/* Plan Configuration */}
+        )}
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -145,7 +138,6 @@ const PlanControls: React.FC<PlanControlsProps> = ({ profile, onGeneratePlan, is
               />
             </div>
           </div>
-
           <div>
             <Label className="mb-3 block font-medium text-foreground">
               Weekly Time Cap: <span className="text-primary font-bold">{capPerWeek[0]} minutes</span> 
@@ -189,23 +181,16 @@ const PlanControls: React.FC<PlanControlsProps> = ({ profile, onGeneratePlan, is
 
         <Button 
           onClick={handleGenerate} 
-          disabled={isGenerating || !canGenerate}
+          disabled={selectedStudentId === ""}
           className="w-full btn-primary bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium"
         >
-          {isGenerating ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent mr-3" />
-              Generating Plan...
-            </>
-          ) : (
-            <>
-              <Calendar className="h-5 w-5 mr-3" />
-              Generate Study Plan
-            </>
-          )}
+          <>
+            <Calendar className="h-5 w-5 mr-3" />
+            Generate Study Plan
+          </>
         </Button>
 
-        {!canGenerate && (
+        {selectedStudentId === "" && (
           <p className="text-small text-muted-foreground text-center">
             Please select a student to generate a study plan
           </p>

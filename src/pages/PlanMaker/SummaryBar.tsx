@@ -1,8 +1,8 @@
 import { Card, CardContent } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { Clock, Target, BookOpen, TrendingUp, User } from 'lucide-react';
-import type { StudyPlan } from '../../lib/schemas';
 import { calculatePlanSummary } from '../../lib/planComposer';
+import type { StudyPlan } from '../../types/plan';
 
 interface SummaryBarProps {
   plan: StudyPlan;
@@ -23,14 +23,14 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
     <Card className="border-border rounded-lg bg-card">
       <CardContent className="p-6">
         {/* Student Info Header */}
-        {plan.meta.studentName && (
+        {plan.meta.student_name && (
           <div className="mb-6 pb-6 border-b border-border">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-primary/10 rounded-lg">
                 <User className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold text-body-large text-foreground">{plan.meta.studentName}</h3>
+                <h3 className="font-bold text-body-large text-foreground">{plan.meta.student_name}</h3>
               </div>
             </div>
           </div>
@@ -63,7 +63,7 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
               <p className="text-small text-muted-foreground mb-1">Practice Items</p>
               <p className="font-bold text-body-large text-foreground">
                 {plan.weeks.reduce((sum, week) => 
-                  sum + week.blocks.reduce((blockSum, block) => blockSum + block.practiceItems, 0), 0
+                  sum + week.blocks.reduce((blockSum, block) => blockSum + block.practice_items, 0), 0
                 )}
               </p>
             </div>
@@ -87,9 +87,9 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
             </div>
             <div>
               <p className="text-small text-muted-foreground mb-1">Weekly Cap</p>
-              <p className="font-bold text-body-large text-foreground">{plan.meta.capMinutesPerWeek} min</p>
+              <p className="font-bold text-body-large text-foreground">{plan.meta.cap_per_week} min</p>
               <p className="text-small text-muted-foreground">
-                {Math.round(plan.meta.capMinutesPerWeek / 60 * 10) / 10} hours
+                {Math.round(plan.meta.cap_per_week / 60 * 10) / 10} hours
               </p>
             </div>
           </div>

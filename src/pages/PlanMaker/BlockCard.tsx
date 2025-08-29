@@ -1,7 +1,7 @@
 import { Badge } from '../../components/Badge';
 import { Card, CardContent } from '../../components/Card';
 import { Clock, Target, Calendar, BookOpen } from 'lucide-react';
-import type { PlanBlock } from '../../lib/schemas';
+import type { PlanBlock } from '../../types/plan';
 import dayjs from 'dayjs';
 
 interface BlockCardProps {
@@ -22,7 +22,7 @@ const sectionColors = {
 } as const;
 
 export function BlockCard({ block }: BlockCardProps) {
-  const dueDate = dayjs(block.dueDateISO).format('MMM D');
+  const dueDate = dayjs(block.due_date).format('MMM D');
   
   return (
     <Card className="h-full border-border rounded-lg bg-card hover:shadow-md transition-shadow">
@@ -62,15 +62,15 @@ export function BlockCard({ block }: BlockCardProps) {
               </div>
               <div className="flex items-center gap-1 text-primary">
                 <Target className="h-4 w-4" />
-                <span className="font-medium">{block.practiceItems} items</span>
+                <span className="font-medium">{block.practice_items} items</span>
               </div>
             </div>
           </div>
 
-          {block.resourceSlugs.length > 0 && (
+          {block.resource_slugs && block.resource_slugs.length > 0 && (
             <div className="flex items-center gap-2 text-small text-muted-foreground pt-2 border-t border-border">
               <BookOpen className="h-3 w-3 shrink-0" />
-              <span className="truncate">{block.resourceSlugs.join(', ')}</span>
+              <span className="truncate">{block.resource_slugs.join(', ')}</span>
             </div>
           )}
         </div>

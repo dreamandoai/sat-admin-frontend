@@ -1,7 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../components/Accordion';
 import { Badge } from '../../components/Badge';
 import { Clock, Target } from 'lucide-react';
-import type { StudyPlan } from '../../lib/schemas';
+import type { StudyPlan } from '../../types/plan';
 import { BlockCard } from './BlockCard';
 
 interface WeekAccordionProps {
@@ -15,7 +15,7 @@ const WeekAccordion: React.FC<WeekAccordionProps> = ({ plan }: WeekAccordionProp
         const totalMinutes = week.blocks.reduce((sum, block) => sum + block.minutes, 0);
         const rwMinutes = week.blocks.filter(b => b.section === 'RW').reduce((sum, block) => sum + block.minutes, 0);
         const mathMinutes = week.blocks.filter(b => b.section === 'Math').reduce((sum, block) => sum + block.minutes, 0);
-        const totalItems = week.blocks.reduce((sum, block) => sum + block.practiceItems, 0);
+        const totalItems = week.blocks.reduce((sum, block) => sum + block.practice_items, 0);
 
         return (
           <AccordionItem 

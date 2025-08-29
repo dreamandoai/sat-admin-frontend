@@ -1,6 +1,6 @@
 import { apiService } from './api';
 import type { ApiError } from '../types/api';
-import type { StudentProfile, StudyPlan } from '../types/plan';
+import type { PlanRequest, StudentProfile, StudyPlan } from '../types/plan';
 
 export const planService = {
   getStudents: async () => {
@@ -12,9 +12,9 @@ export const planService = {
     }
   },
 
-  generatePlan: async () => {
+  generatePlan: async (request: PlanRequest) => {
     try {
-      const response = await apiService.post<StudyPlan>("/plan/generate");
+      const response = await apiService.post<StudyPlan>("/plan/generate", request);
       return response;
     } catch (error) {
       throw error as ApiError

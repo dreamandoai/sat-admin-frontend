@@ -1,6 +1,6 @@
 import { Button } from '../../components/Button';
 import { Printer, Save } from 'lucide-react';
-import type { StudyPlan } from '../../lib/schemas';
+import type { StudyPlan } from '../../types/plan';
 
 interface ExportButtonsProps {
   plan: StudyPlan;
@@ -18,19 +18,8 @@ const ExportButtons: React.FC<ExportButtonsProps> = ({ plan }: ExportButtonsProp
     printWindow.print();
   };
 
-  const handleSave = () => {
-    // This would typically save to a database
-    // For now, we'll just save to localStorage as a demo
-    localStorage.setItem(`study-plan-${plan.userId}`, JSON.stringify(plan));
-    alert('Plan saved to local storage!');
-  };
-
   return (
     <div className="flex gap-2">
-      <Button variant="outline" onClick={handleSave}>
-        <Save className="h-4 w-4 mr-2" style={{ color: '#00213e' }} />
-        Save Plan
-      </Button>
       <Button variant="outline" onClick={handlePrint}>
         <Printer className="h-4 w-4 mr-2" style={{ color: '#00213e' }} />
         Print Plan
@@ -72,9 +61,9 @@ function generatePrintHTML(plan: StudyPlan): string {
         <h1>SAT Study Plan</h1>
         <div class="meta">
           <span>User: ${plan.userId}</span>
-          <span>Generated: ${new Date(plan.meta.generatedAtISO).toLocaleDateString()}</span>
+          <span>Generated: ${new Date(plan.meta.generated_at).toLocaleDateString()}</span>
           <span>Total Time: ${Math.round(totalMinutes / 60 * 10) / 10} hours</span>
-          <span>Weekly Cap: ${plan.meta.capMinutesPerWeek} minutes</span>
+          <span>Weekly Cap: ${plan.meta.cap_per_week} minutes</span>
         </div>
       </div>
       
@@ -93,8 +82,8 @@ function generatePrintHTML(plan: StudyPlan): string {
               <div class="meta">
                 <span>${block.section}</span>
                 <span>${block.minutes} minutes</span>
-                <span>${block.practiceItems} practice items</span>
-                <span>Due: ${new Date(block.dueDateISO).toLocaleDateString()}</span>
+                <span>${block.practice_items} practice items</span>
+                <span>Due: ${new Date(block.due_date).toLocaleDateString()}</span>
               </div>
             </div>
           `).join('')}
