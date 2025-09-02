@@ -1,7 +1,6 @@
 import { Card, CardContent } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { Clock, Target, BookOpen, TrendingUp, User } from 'lucide-react';
-import { calculatePlanSummary } from '../../lib/planComposer';
 import type { StudyPlan } from '../../types/plan';
 
 interface SummaryBarProps {
@@ -16,13 +15,36 @@ const masteryColors = {
   UNKNOWN: 'bg-gray-100 text-gray-800 border-gray-200',
 } as const;
 
+const calculatePlanSummary = (plan: StudyPlan) => {
+  const totalMinutes = { RW: 0, Math: 0 };
+  const masteryDistribution = {
+    PRIORITY_GAP: 0,
+    DEVELOPING: 0,
+    PROFICIENT: 0,
+    MASTERED: 0,
+    UNKNOWN: 0,
+  };
+
+  plan.weeks.forEach(week => {
+    week.blocks.forEach(block => {
+      totalMinutes[block.section] += block.minutes;
+      masteryDistribution[block.mastery]++;
+    });
+  });
+
+  return {
+    totalMinutes,
+    masteryDistribution,
+    totalBlocks: plan.weeks.reduce((sum, week) => sum + week.blocks.length, 0),
+  };
+}
+
 const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
   const summary = calculatePlanSummary(plan);
   
   return (
     <Card className="border-border rounded-lg bg-card">
       <CardContent className="p-6">
-        {/* Student Info Header */}
         {plan.meta.student_name && (
           <div className="mb-6 pb-6 border-b border-border">
             <div className="flex items-center gap-4">
@@ -35,9 +57,7 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
             </div>
           </div>
         )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Time */}
           <div className="flex items-center gap-4">
             <div className="p-3 bg-secondary rounded-lg">
               <Clock className="h-6 w-6 text-primary" />
@@ -53,8 +73,6 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
               </p>
             </div>
           </div>
-
-          {/* Total Items */}
           <div className="flex items-center gap-4">
             <div className="p-3 bg-accent rounded-lg">
               <Target className="h-6 w-6 text-primary" />
@@ -68,8 +86,6 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
               </p>
             </div>
           </div>
-
-          {/* Topics Count */}
           <div className="flex items-center gap-4">
             <div className="p-3 bg-highlight/40 rounded-lg">
               <BookOpen className="h-6 w-6 text-primary" />
@@ -79,8 +95,6 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
               <p className="font-bold text-body-large text-foreground">{summary.totalBlocks}</p>
             </div>
           </div>
-
-          {/* Weekly Cap */}
           <div className="flex items-center gap-4">
             <div className="p-3 bg-primary/10 rounded-lg">
               <TrendingUp className="h-6 w-6 text-primary" />
@@ -94,8 +108,6 @@ const SummaryBar: React.FC<SummaryBarProps> = ({ plan }: SummaryBarProps) => {
             </div>
           </div>
         </div>
-
-        {/* Mastery Distribution */}
         <div className="mt-6 pt-6 border-t border-border">
           <p className="text-small text-muted-foreground mb-3 font-medium">Mastery Distribution</p>
           <div className="flex flex-wrap gap-2">
