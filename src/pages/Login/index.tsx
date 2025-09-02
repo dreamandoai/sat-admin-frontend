@@ -9,27 +9,28 @@ import { authService } from "../../services/authService";
 import type { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { setCredentials, setLoading } from "../../store/authSlice";
+import { setCredentials } from "../../store/authSlice";
 import type { ApiError } from "../../types/api";
 
 const Login: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      dispatch(setLoading(true));
+      setIsLoading(true);
       const response = await authService.login({ email, password, role: "admin" });
       dispatch(setCredentials(response));
       navigate('/');
     } catch (error: unknown) {
-      dispatch(setLoading(false));
+      setIsLoading(false);
       if (typeof error === 'object' && error !== null && 'message' in error) {
         const apiError = error as ApiError;
         setError(apiError.data.detail);
