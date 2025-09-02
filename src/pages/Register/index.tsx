@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/Card"
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { Label } from "../../components/Label";
-import { UserPlus, Eye, EyeOff } from "lucide-react";
+import { Alert, AlertDescription } from "../../components/Alert";
+import { UserPlus, Eye, EyeOff, AlertCircle } from "lucide-react";
 import type { RegisterCredentials, RegisterResponse } from "../../types/auth";
 import { authService } from "../../services/authService";
+import type { ApiError } from "../../types/api";
 
 interface FormData {
   name: string
@@ -34,6 +36,7 @@ const Register: React.FC = () => {
     retypePassword: ''
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRetypePassword, setShowRetypePassword] = useState(false);
@@ -106,9 +109,13 @@ const Register: React.FC = () => {
           navigate('/login');
         }
       } catch (error) {
-        console.error('Login failed:', error);
-        alert('Login failed. Please check your credentials.');
         setIsLoading(false);
+        if (typeof error === 'object' && error !== null && 'message' in error) {
+          const apiError = error as ApiError;
+          setError(apiError.data.detail);
+        } else {
+          console.error('Login failed:', error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -130,6 +137,12 @@ const Register: React.FC = () => {
           <p className="text-small text-muted-foreground">Create your admin account</p>
         </CardHeader>
         <CardContent className="p-6">
+          {error && (
+            <Alert className="mb-6 border-red-200 bg-red-50 rounded-lg" variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-red-800">{error}</AlertDescription>
+            </Alert>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name" className="font-medium text-foreground">Name</Label>
