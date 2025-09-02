@@ -22,6 +22,9 @@ const StudyPlanMaker: React.FC = () => {
 
   useEffect(() => {
     handleGetStudents();
+    return () => {
+      dispatch(setPlan(null));
+    }
   }, []);
 
   const handleGetStudents = async () => {

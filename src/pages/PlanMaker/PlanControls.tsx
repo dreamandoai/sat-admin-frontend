@@ -8,7 +8,7 @@ import { Badge } from '../../components/Badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/Select';
 import { Calendar, Clock, User } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedStudent } from '../../store/planSlice';
+import { setPlan, setSelectedStudent } from '../../store/planSlice';
 import type { RootState } from '../../store';
 import type { StudentProfile, PlanRequest } from '../../types/plan';
 
@@ -33,7 +33,10 @@ const PlanControls: React.FC<PlanControlsProps> = ({ students, onGeneratePlan }:
   useEffect(() => {
     if(selectedStudentId !== "") {
       const temp = students.find((s: StudentProfile) => s.id === selectedStudentId);
-      temp && dispatch(setSelectedStudent(temp))
+      if(temp) {
+        dispatch(setSelectedStudent(temp));
+        dispatch(setPlan(null));
+      }
     }
   }, [selectedStudentId]);
 

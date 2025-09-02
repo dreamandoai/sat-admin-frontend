@@ -30,7 +30,7 @@ const planSlice = createSlice({
       state.testedStudents = action.payload;
       state.isLoading = false;
     },
-    setPlan: (state, action: PayloadAction<StudyPlan>) => {
+    setPlan: (state, action: PayloadAction<StudyPlan | null>) => {
       state.plan = action.payload;
     }
   },
