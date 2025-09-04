@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from "./authSlice";
 import planReducer from "./planSlice";
+import pairReducer from "./pairSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    plan: planReducer
+    plan: planReducer,
+    pair: pairReducer,
   }
 });
 

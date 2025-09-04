@@ -48,6 +48,7 @@ const AdminPortal: React.FC = () => {
           </Card>
           <Card 
             className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 bg-secondary rounded-lg"
+            onClick={() => navigate("/students")}
           >
             <CardContent className="p-8">
               <div className="flex items-start justify-between mb-6">
