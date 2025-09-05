@@ -1,15 +1,17 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Pair, TeacherShort } from '../types/pair';
+import type { DiagnosticResult, Pair, TeacherShort } from '../types/pair';
 
 
 interface PairState {
   pairs: Pair[],
-  teachers: TeacherShort[]
+  teachers: TeacherShort[],
+  diagnosticResults: DiagnosticResult[]
 }
 
 const initialState: PairState = {
   pairs: [],
-  teachers: []
+  teachers: [],
+  diagnosticResults: []
 };
 
 const pairSlice = createSlice({
@@ -21,10 +23,13 @@ const pairSlice = createSlice({
     },
     setTeachers: (state, action: PayloadAction<TeacherShort[]>) => {
       state.teachers = action.payload;
+    },
+    setDiagnosticResults: (state, action: PayloadAction<DiagnosticResult[]>) => {
+      state.diagnosticResults = action.payload;
     }
   },
 });
 
-export const { setPairs, setTeachers } = pairSlice.actions;
+export const { setPairs, setTeachers, setDiagnosticResults } = pairSlice.actions;
 
 export default pairSlice.reducer;
