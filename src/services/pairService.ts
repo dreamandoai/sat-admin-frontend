@@ -1,6 +1,6 @@
 import { apiService } from './api';
 import type { ApiError } from '../types/api';
-import type { Pair, TeacherShort, GeneratePairRequest, DiagnosticResult } from '../types/pair';
+import type { Pair, TeacherShort, GeneratePairRequest, DiagnosticResult, ShareTestResultsRequest } from '../types/pair';
 
 export const pairService = {
   generatePair: async (request: GeneratePairRequest) => {
@@ -32,6 +32,15 @@ export const pairService = {
   getDiagnosticResults: async (studentId: string) => {
     try {
       const response = await apiService.get<DiagnosticResult[]>(`/diagnostic/get-history/${studentId}`);
+      return response;
+    } catch (error) {
+      throw error as ApiError
+    }
+  },
+
+  shareStudentResultsWithTeacher: async (request: ShareTestResultsRequest) => {
+    try {
+      const response = await apiService.post("/user/share-student", request);
       return response;
     } catch (error) {
       throw error as ApiError

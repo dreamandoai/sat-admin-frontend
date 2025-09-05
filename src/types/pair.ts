@@ -43,3 +43,8 @@ export interface DiagnosticResult {
   },
   mastery: "PRIORITY_GAP" | "DEVELOPING" | "PROFICIENT" | "MASTERED" | "UNKNOWN",
 }
+
+export interface ShareTestResultsRequest {
+  student: string,
+  teachers: string[]
+}

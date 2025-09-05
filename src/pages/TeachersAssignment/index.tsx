@@ -81,7 +81,9 @@ const TeachersAssignment: React.FC = () => {
             {/* Right Column - Student Details and Teacher Assignment */}
             <div className="lg:col-span-2 space-y-6">
               {/* Student Profile Card */}
-              <StudentProfileCard pair={selectedPair} />
+              <StudentProfileCard 
+                pair={selectedPair}
+              />
 
               {/* Teacher Assignment Card */}
               <TeacherAssignmentCard

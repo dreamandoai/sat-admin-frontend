@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/Card';
 import { Button } from '../../components/Button';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Send } from 'lucide-react';
 import type { RootState } from '../../store';
 import type { DiagnosticResult, Pair } from '../../types/pair';
 import { pairService } from '../../services/pairService';
@@ -15,6 +15,7 @@ interface StudentProfileCardProps {
 
 const StudentProfileCard: React.FC<StudentProfileCardProps> = ({ pair }) => {
   const dispatch = useDispatch();
+  const [isSendingResults, setIsSendingResults] = React.useState<boolean>(false);
   const { diagnosticResults } = useSelector((state: RootState) => state.pair);
   const mathDiagnosticResults = useMemo(() => diagnosticResults.filter((d: DiagnosticResult) => d.section === "Math"), [diagnosticResults]);
   const rwDiagnosticResults = useMemo(() => diagnosticResults.filter((d: DiagnosticResult) => d.section === "RW"), [diagnosticResults]);
@@ -73,9 +74,24 @@ const StudentProfileCard: React.FC<StudentProfileCardProps> = ({ pair }) => {
     }
   };
 
+  const handleSendResults = async () => {
+    setIsSendingResults(true);
+    try {
+      await pairService.shareStudentResultsWithTeacher({
+        student: pair.student.id,
+        teachers: [pair.math_teacher_id, pair.rw_teacher_id].filter(Boolean) as string[]
+      });
+      setIsSendingResults(false);
+    } catch (error) {
+      setIsSendingResults(false);
+      const apiError = error as ApiError;
+      console.error("Failed to send results to teachers:", apiError.message);
+    }
+  };
+
   useEffect(() => {
     handleGetDiagnosticResults();
-  }, [])
+  }, []);
 
   return (
     <Card className="bg-card border-border rounded-lg shadow-lg">
@@ -129,9 +145,9 @@ const StudentProfileCard: React.FC<StudentProfileCardProps> = ({ pair }) => {
             </div>
 
             {/* Send Results Button */}
-            {/* <Button
+            <Button
               onClick={handleSendResults}
-              disabled={isSendingResults || (!selectedMathTeacher && !selectedEnglishTeacher)}
+              disabled={isSendingResults || (!pair.math_teacher_id && !pair.rw_teacher_id)}
               className="w-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity mb-4 bg-highlight hover:bg-highlight/90 text-highlight-foreground rounded-lg"
             >
               {isSendingResults ? (
@@ -145,7 +161,7 @@ const StudentProfileCard: React.FC<StudentProfileCardProps> = ({ pair }) => {
                   Send Results to Teachers
                 </>
               )}
-            </Button> */}
+            </Button>
             
             {/* Legend */}
             <div className="flex items-center justify-center gap-6 text-small mb-4 text-foreground">
