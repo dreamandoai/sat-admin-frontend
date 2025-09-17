@@ -180,7 +180,7 @@ const StudyPlanMaker: React.FC = () => {
                 )}
               </div>
             </div>
-          ): <div> There are no students </div>
+          ): <div className='text-center'> There are no students for generating a study plan </div>
       }
     </div>
   );
