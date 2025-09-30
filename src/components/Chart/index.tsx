@@ -67,40 +67,26 @@ function ChartContainer({
   );
 }
 
-const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-  const colorConfig = Object.entries(config).filter(
-    ([, config]) => config.theme || config.color,
-  );
-
-  if (!colorConfig.length) {
-    return null;
-  }
-
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-              ${prefix} [data-chart=${id}] {
-              ${colorConfig
-                .map(([key, itemConfig]) => {
-                  const color =
-                    itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-                    itemConfig.color;
-                  return color ? `  --color-${key}: ${color};` : null;
-                })
-                .join("\n")}
-              }
-              `,
-          )
-          .join("\n"),
-      }}
-    />
-  );
-};
-
-const ChartTooltip = RechartsPrimitive.Tooltip;
+interface ChartTooltipContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  active?: boolean;
+  payload?: Array<{
+    dataKey?: string;
+    name?: string;
+    value?: number;
+    payload?: any;
+    color?: string;
+  }>;
+  indicator?: "line" | "dot" | "dashed";
+  hideLabel?: boolean;
+  hideIndicator?: boolean;
+  label?: string;
+  labelFormatter?: (label: any, payload: any[]) => React.ReactNode;
+  labelClassName?: string;
+  formatter?: (value: any, name: string, props: any, index: number, payload: any) => React.ReactNode;
+  color?: string;
+  nameKey?: string;
+  labelKey?: string;
+}
 
 function ChartTooltipContent({
   active,
@@ -116,14 +102,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
-    hideLabel?: boolean;
-    hideIndicator?: boolean;
-    indicator?: "line" | "dot" | "dashed";
-    nameKey?: string;
-    labelKey?: string;
-  }) {
+}: ChartTooltipContentProps) {
   const { config } = useChart();
 
   const tooltipLabel = React.useMemo(() => {
@@ -180,7 +159,7 @@ function ChartTooltipContent({
         {payload.map((item: any, index: number) => {
           const key = `${nameKey || item.name || item.dataKey || "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
-          const indicatorColor = color || item.payload.fill || item.color;
+          const indicatorColor = color || item.payload?.fill || item.color;
 
           return (
             <div
@@ -246,7 +225,16 @@ function ChartTooltipContent({
   );
 }
 
-const ChartLegend = RechartsPrimitive.Legend;
+interface ChartLegendContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  hideIcon?: boolean;
+  payload?: Array<{
+    value: string;
+    color: string;
+    dataKey?: string;
+  }>;
+  verticalAlign?: "top" | "middle" | "bottom";
+  nameKey?: string;
+}
 
 function ChartLegendContent({
   className,
@@ -254,11 +242,7 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
-}: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-    hideIcon?: boolean;
-    nameKey?: string;
-  }) {
+}: ChartLegendContentProps) {
   const { config } = useChart();
 
   if (!payload?.length) {
@@ -301,6 +285,41 @@ function ChartLegendContent({
     </div>
   );
 }
+
+const ChartTooltip = RechartsPrimitive.Tooltip;
+const ChartLegend = RechartsPrimitive.Legend;
+const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
+  const colorConfig = Object.entries(config).filter(
+    ([, config]) => config.theme || config.color,
+  );
+
+  if (!colorConfig.length) {
+    return null;
+  }
+
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: Object.entries(THEMES)
+          .map(
+            ([theme, prefix]) => `
+              ${prefix} [data-chart=${id}] {
+              ${colorConfig
+                .map(([key, itemConfig]) => {
+                  const color =
+                    itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
+                    itemConfig.color;
+                  return color ? `  --color-${key}: ${color};` : null;
+                })
+                .join("\n")}
+              }
+              `,
+          )
+          .join("\n"),
+      }}
+    />
+  );
+};
 
 // Helper to extract item config from a payload.
 function getPayloadConfigFromPayload(

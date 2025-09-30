@@ -1,5 +1,4 @@
 import React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 
 import { cn } from "../../utils/utils";
@@ -57,13 +56,8 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        IconLeft: ({ ...props }) => (
-          <ChevronLeft className={cn("size-4", className)} {...props} />
-        ),
-        IconRight: ({ ...props }) => (
-          <ChevronRight className={cn("size-4", className)} {...props} />
-        ),
+      modifiersClassNames={{
+        selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground"
       }}
       {...props}
     />

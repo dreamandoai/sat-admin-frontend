@@ -17,8 +17,7 @@ const TeachersAssignment: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedMathTeacher, setSelectedMathTeacher] = useState<string>('');
   const [selectedEnglishTeacher, setSelectedEnglishTeacher] = useState<string>('');
-  const [error, setError] = useState<string>("");
-
+  
   const handlePairSelect = (pair: Pair) => {
     setSelectedPair(pair);
     setSelectedMathTeacher(pair.math_teacher_id || '');
@@ -42,7 +41,7 @@ const TeachersAssignment: React.FC = () => {
     } catch (error: unknown) {
       if (typeof error === 'object' && error !== null && 'message' in error) {
         const apiError = error as ApiError;
-        setError(apiError.data.detail);
+        console.error(apiError.data.detail);
       } else {
         console.error('Unexpected error:', error);
       }
