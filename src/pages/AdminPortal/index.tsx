@@ -1,6 +1,10 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../../store';
 import { Card, CardContent } from '../../components/Card';
 import Header from '../../layouts/Header';
+import { studentInfoService } from '../../services/studentInfoService';
 import { 
   Calendar, 
   Users, 
@@ -9,11 +13,39 @@ import {
   FileText,
   BarChart3,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from 'lucide-react';
+import { setStudentsInfo } from '../../store/studentsInfoSlice';
+import type { ApiError } from '../../types/api';
 
 const AdminPortal: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { numberOfStudents, averageScore, numberOfStudyPlans } = useSelector((state: RootState) => state.studentsInfo);
+  const [ isLoading, setIsLoading ] = useState<boolean>(false);
+  
+
+  const handleGetStudentsInfo = async () => {
+    setIsLoading(true);
+    try {
+      const response = await studentInfoService.getStudentsInfo();
+      dispatch(setStudentsInfo(response));
+      setIsLoading(false);
+    } catch (error: unknown) {
+      setIsLoading(false);
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        const apiError = error as ApiError;
+        console.error('Error fetching students info:', apiError.data.detail);
+      } else {
+        console.error('Unexpected error:', error);
+      }
+    }
+  }
+
+  useEffect(() => {
+    handleGetStudentsInfo();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -65,7 +97,7 @@ const AdminPortal: React.FC = () => {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-small text-foreground/70">
-                  24 active students
+                  {isLoading ? 'Loading...' : `${numberOfStudents || 0} active students`}
                 </span>
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -175,7 +207,7 @@ const AdminPortal: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
           <Card className="bg-card border-border rounded-lg">
             <CardContent className="p-6 text-center">
               <div className="p-3 bg-primary/10 rounded-lg inline-block mb-3">
@@ -184,18 +216,13 @@ const AdminPortal: React.FC = () => {
               <h4 className="text-body-standard font-medium text-foreground mb-1">
                 Total Students
               </h4>
-              <p className="text-h2 font-bold text-primary">24</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border rounded-lg">
-            <CardContent className="p-6 text-center">
-              <div className="p-3 bg-highlight/20 rounded-lg inline-block mb-3">
-                <Calendar className="h-6 w-6 text-foreground" />
-              </div>
-              <h4 className="text-body-standard font-medium text-foreground mb-1">
-                Classes Today
-              </h4>
-              <p className="text-h2 font-bold text-foreground">3</p>
+              <p className="text-h2 font-bold text-primary">
+                {isLoading ? (
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                ) : (
+                  numberOfStudents || 0
+                )}
+              </p>
             </CardContent>
           </Card>
           <Card className="bg-card border-border rounded-lg">
@@ -206,7 +233,13 @@ const AdminPortal: React.FC = () => {
               <h4 className="text-body-standard font-medium text-foreground mb-1">
                 Study Plans
               </h4>
-              <p className="text-h2 font-bold text-foreground">12</p>
+              <p className="text-h2 font-bold text-primary">
+                {isLoading ? (
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                ) : (
+                  numberOfStudyPlans || 0
+                )}
+              </p>
             </CardContent>
           </Card>
           <Card className="bg-card border-border rounded-lg">
@@ -217,7 +250,13 @@ const AdminPortal: React.FC = () => {
               <h4 className="text-body-standard font-medium text-foreground mb-1">
                 Avg. Score
               </h4>
-              <p className="text-h2 font-bold text-primary">1420</p>
+              <p className="text-h2 font-bold text-primary">
+                {isLoading ? (
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                ) : (
+                  averageScore || 0
+                )}
+              </p>
             </CardContent>
           </Card>
         </div>
