@@ -16,12 +16,12 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/portal" replace />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route element={<PrivateRoute />}>
-            <Route path="portal" element={<AdminPortal />} />
-            <Route path="planner" element={<PlanMaker />} />
-            <Route path="students" element={<TeachersAssignment />} />
+            <Route path="/portal" element={<AdminPortal />} />
+            <Route path="/planner" element={<PlanMaker />} />
+            <Route path="/students" element={<TeachersAssignment />} />
           </Route>
           <Route path="*" element={<Navigate to="/portal" replace />} />
         </Routes>

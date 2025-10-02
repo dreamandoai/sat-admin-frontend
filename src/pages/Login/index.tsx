@@ -28,7 +28,7 @@ const Login: React.FC = () => {
       setIsLoading(true);
       const response = await authService.login({ email, password, role: "admin" });
       dispatch(setCredentials(response));
-      navigate('/');
+      navigate('/portal');
     } catch (error: unknown) {
       setIsLoading(false);
       if (typeof error === 'object' && error !== null && 'message' in error) {
