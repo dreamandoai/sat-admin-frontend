@@ -104,16 +104,16 @@ const TeachersAssignment: React.FC = () => {
           </div>
         </main>
       ): null}
-      {pairs.length === 0 && (
-        <div className="flex justify-center items-center h-screen">
-          <p className="text-body-standard text-foreground">No pairs found</p>
-        </div>
-      )}
-      {isLoading && (
+      {isLoading ? (
         <div className="flex justify-center items-center h-screen">
           <Loader2 className="h-8 w-8 animate-spin mx-auto" />
         </div>
-      )}
+      ): (
+        pairs.length === 0 && (
+        <div className="flex justify-center items-center h-screen">
+          <p className="text-body-standard text-foreground">No pairs found</p>
+        </div>
+      ))}
     </div>
   )
 }
