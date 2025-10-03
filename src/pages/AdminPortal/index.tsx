@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { Card, CardContent } from '../../components/Card';
 import Header from '../../layouts/Header';
-import { studentInfoService } from '../../services/studentInfoService';
+import { studentsInfoService } from '../../services/studentsInfoService';
 import { 
-  Calendar, 
+  UserCog, 
   Users, 
   BookOpen, 
   Brain, 
@@ -29,7 +29,7 @@ const AdminPortal: React.FC = () => {
   const handleGetStudentsInfo = async () => {
     setIsLoading(true);
     try {
-      const response = await studentInfoService.getStudentsInfo();
+      const response = await studentsInfoService.getStudentsInfo();
       dispatch(setStudentsInfo(response));
       setIsLoading(false);
     } catch (error: unknown) {
@@ -55,30 +55,6 @@ const AdminPortal: React.FC = () => {
         {/* Main Action Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card 
-            className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 bg-primary rounded-lg"
-          >
-            <CardContent className="p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div className="p-4 bg-card/20 rounded-xl backdrop-blur-sm">
-                  <Calendar className="h-8 w-8 text-foreground" />
-                </div>
-                <BarChart3 className="h-5 w-5 text-foreground/70" />
-              </div>
-              <h3 className="text-body-large font-medium text-foreground mb-3">
-                Class Calendar
-              </h3>
-              <p className="text-small text-foreground/80 mb-4 leading-relaxed">
-                Schedule and manage your SAT prep classes
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-small text-foreground/70">
-                  8 classes this week
-                </span>
-                <div className="w-2 h-2 bg-foreground rounded-full animate-pulse"></div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card 
             className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 bg-secondary rounded-lg"
             onClick={() => navigate("/students")}
           >
@@ -93,7 +69,7 @@ const AdminPortal: React.FC = () => {
                 Students
               </h3>
               <p className="text-small text-foreground/80 mb-4 leading-relaxed">
-                Monitor student progress and performance
+                Assign teachers and view diagnostic results
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-small text-foreground/70">
@@ -124,7 +100,7 @@ const AdminPortal: React.FC = () => {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-small text-foreground/70">
-                  45+ resources
+                  ✨ Click to open
                 </span>
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
               </div>
@@ -179,30 +155,28 @@ const AdminPortal: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          <Card
+          <Card 
             className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 bg-card rounded-lg"
+            onClick={() => navigate('ai-access')}
           >
             <CardContent className="p-8">
               <div className="flex items-start justify-between mb-6">
                 <div className="p-4 bg-card/30 rounded-xl backdrop-blur-sm">
-                  <BarChart3 className="h-8 w-8 text-foreground" />
+                  <UserCog className="h-8 w-8 text-foreground" />
                 </div>
-                <TrendingUp className="h-5 w-5 text-foreground/70" />
+                <Users className="h-5 w-5 text-foreground/70" />
               </div>
               <h3 className="text-body-large font-medium text-foreground mb-3">
-                Analytics
+                SAT AI Access
               </h3>
               <p className="text-small text-foreground/80 mb-4 leading-relaxed">
-                View performance insights and reports
+                Manage user access to SAT AI features
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-small text-foreground/70">
-                  Real-time data
+                  12 users with access
                 </span>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-foreground rounded-full"></div>
-                </div>
+                <div className="w-2 h-2 bg-primary rounded-full"></div>
               </div>
             </CardContent>
           </Card>

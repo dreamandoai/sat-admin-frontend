@@ -5,7 +5,7 @@ import type { Pair } from '../../types/pair';
 import { pairService } from '../../services/pairService';
 import { setPairs, setTeachers } from '../../store/pairSlice';
 import type { ApiError } from '../../types/api';
-import Header from './Header';
+import Navbar from '../../layouts/Navbar';
 import LeftPanel from './LeftPanel';
 import StudentProfileCard from './StudentProfileCard';
 import TeacherAssignmentCard from './TeacherAssignmentCard';
@@ -62,8 +62,8 @@ const TeachersAssignment: React.FC = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#b2dafb' }}>
-      {/* Header */}
-      <Header />
+      {/* Nav */}
+      <Navbar title="Students" subtitle="Manage student assignments and view diagnostic results" />
       {/* Main Content */}
       {selectedPair ? (
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
