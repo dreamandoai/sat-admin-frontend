@@ -9,6 +9,8 @@ import Navbar from '../../layouts/Navbar';
 import LeftPanel from './LeftPanel';
 import StudentProfileCard from './StudentProfileCard';
 import TeacherAssignmentCard from './TeacherAssignmentCard';
+import { Loader2 } from 'lucide-react';
+
 
 const TeachersAssignment: React.FC = () => {
   const dispatch = useDispatch();
@@ -17,7 +19,8 @@ const TeachersAssignment: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedMathTeacher, setSelectedMathTeacher] = useState<string>('');
   const [selectedEnglishTeacher, setSelectedEnglishTeacher] = useState<string>('');
-  
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const handlePairSelect = (pair: Pair) => {
     setSelectedPair(pair);
     setSelectedMathTeacher(pair.math_teacher_id || '');
@@ -34,10 +37,12 @@ const TeachersAssignment: React.FC = () => {
   
   const handleGetPairsAndTeachers = async () => {
     try {
+      setIsLoading(true);
       const response = await pairService.getPairs();
       dispatch(setPairs(response));
       const responseTeachers = await pairService.getTeachers();
       dispatch(setTeachers(responseTeachers));
+      setIsLoading(false);
     } catch (error: unknown) {
       if (typeof error === 'object' && error !== null && 'message' in error) {
         const apiError = error as ApiError;
@@ -45,6 +50,8 @@ const TeachersAssignment: React.FC = () => {
       } else {
         console.error('Unexpected error:', error);
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -100,6 +107,11 @@ const TeachersAssignment: React.FC = () => {
       {pairs.length === 0 && (
         <div className="flex justify-center items-center h-screen">
           <p className="text-body-standard text-foreground">No pairs found</p>
+        </div>
+      )}
+      {isLoading && (
+        <div className="flex justify-center items-center h-screen">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
         </div>
       )}
     </div>
