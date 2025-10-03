@@ -73,7 +73,7 @@ const AdminPortal: React.FC = () => {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-small text-foreground/70">
-                  {isLoading ? 'Loading...' : `${numberOfStudents || 0} active students`}
+                  {`${numberOfStudents || 0} active students`}
                 </span>
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -84,6 +84,7 @@ const AdminPortal: React.FC = () => {
           </Card>
           <Card 
             className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 bg-card rounded-lg"
+            onClick={() => navigate("/resources")}
           >
             <CardContent className="p-8">
               <div className="flex items-start justify-between mb-6">

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 
 interface NavbarProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ title, subtitle }) => {
@@ -28,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ title, subtitle }) => {
               {title}
             </h1>
             <p className="text-small text-muted-foreground">
-              {subtitle}
+              {subtitle || ""}
             </p>
           </div>
         </div>

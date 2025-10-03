@@ -3,6 +3,7 @@ import authReducer from "./authSlice";
 import planReducer from "./planSlice";
 import pairReducer from "./pairSlice";
 import studentsInfoReducer from "./studentsInfoSlice";
+import resourceReducer from "./resourceSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     plan: planReducer,
     pair: pairReducer,
     studentsInfo: studentsInfoReducer,
+    resource: resourceReducer,
   }
 });
 
