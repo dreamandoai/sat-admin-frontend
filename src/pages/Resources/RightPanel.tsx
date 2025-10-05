@@ -65,7 +65,7 @@ const RightPanel: React.FC<RightPanelProps> = ({ selectedFolder, onSelectedFolde
           token: previousState.pageToken,
           remainingFolders: previousState.remainingFolders,
           hasNextPage: true,
-          hasPreviousPage: paginationHistory.length > 2
+          hasPreviousPage: paginationHistory.length > 1
         }));
         return;
       }
