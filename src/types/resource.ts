@@ -18,13 +18,24 @@ export interface FileNode{
 
 export interface GetFilesRequest {
   folder_id: string,
-  page_token?: string
-  remaining_folders?: string[]
+  token?: string
+  remaining_folders?: string[],
+  direction?: "next" | "previous",
+  pagination_history?: History[]
 }
 
 export interface GetFilesResponseState {
   currentFolder: string | null,
   nextPageToken: string | null,
+  remainingFolders: string[],
+  paginationHistory: History[]
+}
+
+export interface History {
+  currentFolder: string | null,
+  files: FileNode[],
+  pageToken: string | null,
+  prevPageToken: string | null,
   remainingFolders: string[]
 }
 

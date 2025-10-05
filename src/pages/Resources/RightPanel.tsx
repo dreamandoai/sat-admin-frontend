@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Grid3X3, List, Folder, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../../components/Button';
-import type { FileNode, FolderNode } from '../../types/resource';
+import type { FileNode, FolderNode, GetFilesRequest, History } from '../../types/resource';
 import { resourceService } from '../../services/resourceService';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFilesToShow } from '../../store/resourceSlice';
@@ -16,64 +16,160 @@ interface RightPanelProps {
   onSelectedFolder: (folder: FolderNode | null) => void
 }
 
+// Pagination state interface for better type safety
+interface PaginationState {
+  currentFolderId: string | null;
+  token: string | null;
+  remainingFolders: string[];
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 const RightPanel: React.FC<RightPanelProps> = ({ selectedFolder, onSelectedFolder }) => {
   const dispatch = useDispatch();
   const { filesToShow } = useSelector((state: RootState) => state.resource);
+  
+  // UI state
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [loading, setLoading] = useState<boolean>(false);
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
-  const [token, setToken] = useState<string>("");
-  const [remainingFolders, setRemainingFolders] = useState<string[] | null>(null);
-  const [isShowNextButton, setIsShowNextButton] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [showPDFViewer, setShowPDFViewer] = useState<boolean>(false);
-
-  useEffect(() => {
-    handleGetFilesToShow();
-    setToken("");
-    setRemainingFolders(null);
-    setIsShowNextButton(false);
-    setCurrentFolderId(null);
-  }, [selectedFolder]);
   
-  const handleGetFilesToShow = async () => {
-    if(selectedFolder) {
-      setLoading(true);
-      try {
-        const response = await resourceService.getFiles({
-          folder_id: currentFolderId ? currentFolderId : selectedFolder.id,
-          page_token: token === "" ? undefined : token,
-          remaining_folders: remainingFolders ? remainingFolders : undefined
-        })
-        dispatch(setFilesToShow(response.files));
-        const state = response.state;
-        if(state.remainingFolders.length > 0 && state.nextPageToken) {
-          setIsShowNextButton(true);
-          setCurrentFolderId(state.currentFolder);
-          setRemainingFolders(state.remainingFolders);
-          setToken(state.nextPageToken);
-        } else {
-          setIsShowNextButton(false);
-        }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        if (typeof error === 'object' && error !== null && 'message' in error) {
-          const apiError = error as ApiError;
-          console.log("Error: ", apiError.data.detail);
-        } else {
-          console.error('Error getting teachers:', error);
-        }
-      }
+  // Pagination state
+  const [paginationState, setPaginationState] = useState<PaginationState>({
+    currentFolderId: null,
+    token: null,
+    remainingFolders: [],
+    hasNextPage: false,
+    hasPreviousPage: false
+  });
+
+  // Client-side pagination history management
+  const [paginationHistory, setPaginationHistory] = useState<History[]>([]);
+
+  // Reset pagination state when folder changes
+  useEffect(() => {
+    if (selectedFolder) {
+      setPaginationState({
+        currentFolderId: selectedFolder.id,
+        token: null,
+        remainingFolders: [],
+        hasNextPage: false,
+        hasPreviousPage: false
+      });
+      setPaginationHistory([]); // Reset history when folder changes
+      handleGetFilesToShow();
     } else {
       dispatch(setFilesToShow([]));
     }
-  };
+  }, [selectedFolder, dispatch]);
 
-  const handleClosePDFViewer = () => {
-    setShowPDFViewer(false)
-    setSelectedFile(null)
-  }
+  const handleGetFilesToShow = useCallback(async (direction?: "next" | "previous") => {
+    if (!selectedFolder) {
+      dispatch(setFilesToShow([]));
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const requestParams: GetFilesRequest = {
+        folder_id: paginationState.currentFolderId || selectedFolder.id
+      };
+
+      if (direction === "next") {
+        // Forward navigation
+        if (paginationState.token) {
+          requestParams.token = paginationState.token;
+        }
+        if (paginationState.remainingFolders.length > 0) {
+          requestParams.remaining_folders = paginationState.remainingFolders;
+        }
+        requestParams.direction = "next";
+        if (paginationHistory.length > 0) {
+          requestParams.pagination_history = paginationHistory;
+        }
+      } else if (direction === "previous") {
+        // Backward navigation
+        requestParams.direction = "previous";
+        if (paginationHistory.length > 0) {
+          requestParams.pagination_history = paginationHistory;
+        }
+      }
+
+      const response = await resourceService.getFiles(requestParams);
+      
+      // Update files in store
+      dispatch(setFilesToShow(response.files));
+      
+      // Manage client-side pagination history with PROPER history management
+      let updatedHistory = [...paginationHistory];
+      
+      if (direction === "next") {
+        // Store current state in history before moving forward
+        // This includes the forward state we're about to navigate to
+        const currentHistoryEntry: History = {
+          currentFolder: paginationState.currentFolderId,
+          pageToken: paginationState.token,
+          remainingFolders: paginationState.remainingFolders,
+          files: filesToShow, // Current files before navigation
+          prevPageToken: null
+        };
+        
+        updatedHistory = [...updatedHistory, currentHistoryEntry];
+        setPaginationHistory(updatedHistory);
+      } else if (direction === "previous") {
+        // Remove the last entry from history when going back
+        updatedHistory = updatedHistory.slice(0, -1);
+        setPaginationHistory(updatedHistory);
+      }
+      
+      // Update pagination state with PROPER history management
+      const newPaginationState: PaginationState = {
+        currentFolderId: response.state.currentFolder,
+        token: response.state.nextPageToken,
+        remainingFolders: response.state.remainingFolders || [],
+        hasNextPage: (() => {
+          if (direction === "previous") {
+            // When going back, check if we have forward history
+            // If we're not at the beginning, there should be a next page
+            return updatedHistory.length > 0;
+          }
+          // For next navigation or initial load, use API response
+          return (response.state.remainingFolders?.length || 0) > 0 && !!response.state.nextPageToken;
+        })(),
+        hasPreviousPage: updatedHistory.length > 0
+      };
+      
+      setPaginationState(newPaginationState);
+      
+    } catch (error) {
+      console.error('Error fetching files:', error);
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        const apiError = error as ApiError;
+        console.error("API Error:", apiError.data?.detail || apiError.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedFolder, paginationState, paginationHistory, filesToShow, dispatch]);
+
+  const handleNextPage = useCallback(() => {
+    if (paginationState.hasNextPage) {
+      handleGetFilesToShow("next");
+    }
+  }, [paginationState.hasNextPage, handleGetFilesToShow]);
+
+  const handlePreviousPage = useCallback(() => {
+    if (paginationState.hasPreviousPage) {
+      handleGetFilesToShow("previous");
+    }
+  }, [paginationState.hasPreviousPage, handleGetFilesToShow]);
+
+  const handleClosePDFViewer = useCallback(() => {
+    setShowPDFViewer(false);
+    setSelectedFile(null);
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#ffffff]">
@@ -104,14 +200,16 @@ const RightPanel: React.FC<RightPanelProps> = ({ selectedFolder, onSelectedFolde
             <Button
               size="sm"
               className="p-2 rounded-lg"
+              disabled={!paginationState.hasPreviousPage}
+              onClick={handlePreviousPage}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
               size="sm"
               className="p-2 rounded-lg"
-              disabled={!isShowNextButton}
-              onClick={handleGetFilesToShow}
+              disabled={!paginationState.hasNextPage}
+              onClick={handleNextPage}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -143,12 +241,12 @@ const RightPanel: React.FC<RightPanelProps> = ({ selectedFolder, onSelectedFolde
 
       {/* File Display Area */}
       <div className="flex-1 p-6 overflow-auto bg-[#ffffff]">
-        {loading ?
+        {loading ? (
           <div className='w-full h-full flex justify-center items-center'>
             <div className="h-10 w-10 animate-spin rounded-full border-1 border-[#00213e] border-t-transparent">
             </div>
-          </div> : 
-        filesToShow.length === 0 ? (
+          </div>
+        ) : filesToShow.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Folder className="h-16 w-16 text-gray-300 mb-4" />
             <h3 
@@ -192,7 +290,9 @@ const RightPanel: React.FC<RightPanelProps> = ({ selectedFolder, onSelectedFolde
         )}
       </div>
 
-      {selectedFile && showPDFViewer && <PDFViewer file={selectedFile} onClose={handleClosePDFViewer} />}
+      {selectedFile && showPDFViewer && (
+        <PDFViewer file={selectedFile} onClose={handleClosePDFViewer} />
+      )}
     </div>
   )
 }
