@@ -63,17 +63,23 @@ const AIAccessManagement: React.FC = ({}) => {
   const toggleTeacherAccess = async (teacherId: string) => {
     const index = registeredTeachers.findIndex(teacher => teacher.id === teacherId);
     await userDirectoryService.setUserAiAccess([{ user_id: teacherId, ai_access_granted: !registeredTeachers[index].is_access_granted }]);
-    let temp = registeredTeachers;
-    temp[index].is_access_granted = !temp[index].is_access_granted;
-    dispatch(setRegisteredTeachers(temp));
+    const updatedTeachers = registeredTeachers.map((teacher, i) => 
+      i === index 
+        ? { ...teacher, is_access_granted: !teacher.is_access_granted }
+        : teacher
+    );
+    dispatch(setRegisteredTeachers(updatedTeachers));
   };
 
   const toggleStudentAccess = async (studentId: string) => {
     const index = registeredStudents.findIndex(student => student.id === studentId);
     await userDirectoryService.setUserAiAccess([{ user_id: studentId, ai_access_granted: !registeredStudents[index].is_access_granted }]);
-    let temp = registeredStudents;
-    temp[index].is_access_granted = !temp[index].is_access_granted;
-    dispatch(setRegisteredStudents(temp));
+    const updatedStudents = registeredStudents.map((student, i) => 
+      i === index 
+        ? { ...student, is_access_granted: !student.is_access_granted }
+        : student
+    );
+    dispatch(setRegisteredStudents(updatedStudents));
   };
 
   // Grant all access functions
