@@ -20,6 +20,8 @@ import {
 import { setStudentsInfo, setNumberOfTeachers } from '../../store/studentsInfoSlice';
 import type { ApiError } from '../../types/api';
 
+const AI_URL = import.meta.env.VITE_AI_URL;
+
 const AdminPortal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -55,6 +57,10 @@ const AdminPortal: React.FC = () => {
   useEffect(() => {
     handleGetStudentsInfo();
   }, []);
+
+  const handleSATAIClick = () => {
+    window.open(`${AI_URL}?token=${localStorage.getItem("access_token")}`, "_blank");
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -118,6 +124,7 @@ const AdminPortal: React.FC = () => {
           </Card>
           <Card 
             className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 bg-primary rounded-lg"
+            onClick={handleSATAIClick}
           >
             <CardContent className="p-8">
               <div className="flex items-start justify-between mb-6">
