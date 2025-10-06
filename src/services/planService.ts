@@ -19,5 +19,14 @@ export const planService = {
     } catch (error) {
       throw error as ApiError
     }
+  },
+  
+  getPlan: async (studentId: string) => {
+    try {
+      const response = await apiService.get<StudyPlan>(`/plan/${studentId}`);
+      return response;
+    } catch (error) {
+      throw error as ApiError
+    }   
   }
 };

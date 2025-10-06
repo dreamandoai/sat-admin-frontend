@@ -8,16 +8,17 @@ import { Badge } from '../../components/Badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/Select';
 import { Calendar, Clock, User } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setPlan, setSelectedStudent } from '../../store/planSlice';
+import { setSelectedStudent } from '../../store/planSlice';
 import type { RootState } from '../../store';
 import type { StudentProfile, PlanRequest } from '../../types/plan';
 
 interface PlanControlsProps {
   students: StudentProfile[];
   onGeneratePlan: (config: PlanRequest) => void;
+  disabledGeneratePlan: boolean;
 }
 
-const PlanControls: React.FC<PlanControlsProps> = ({ students, onGeneratePlan }: PlanControlsProps) => {
+const PlanControls: React.FC<PlanControlsProps> = ({ students, onGeneratePlan, disabledGeneratePlan }: PlanControlsProps) => {
   const dispatch = useDispatch();
   const { selectedStudent } = useSelector((state: RootState) => state.plan);
 
@@ -35,7 +36,6 @@ const PlanControls: React.FC<PlanControlsProps> = ({ students, onGeneratePlan }:
       const temp = students.find((s: StudentProfile) => s.id === selectedStudentId);
       if(temp) {
         dispatch(setSelectedStudent(temp));
-        dispatch(setPlan(null));
       }
     }
   }, [selectedStudentId]);
@@ -184,7 +184,7 @@ const PlanControls: React.FC<PlanControlsProps> = ({ students, onGeneratePlan }:
 
         <Button 
           onClick={handleGenerate} 
-          disabled={selectedStudentId === ""}
+          disabled={selectedStudentId === "" || disabledGeneratePlan}
           className="w-full btn-primary bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium"
         >
           <>
@@ -193,7 +193,7 @@ const PlanControls: React.FC<PlanControlsProps> = ({ students, onGeneratePlan }:
           </>
         </Button>
 
-        {selectedStudentId === "" && (
+        {selectedStudentId === "" || disabledGeneratePlan && (
           <p className="text-small text-muted-foreground text-center">
             Please select a student to generate a study plan
           </p>

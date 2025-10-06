@@ -27,6 +27,21 @@ const StudyPlanMaker: React.FC = () => {
     }
   }, []);
 
+  const handleGetPlan = async (studentId: string) => {
+    try {
+      const response = await planService.getPlan(studentId);
+      dispatch(setPlan(response));
+    } catch (error: unknown) {
+      console.error('Unexpected error:', error);
+    }
+  }
+
+  useEffect(() => {
+    if(selectedStudent) {
+      handleGetPlan(selectedStudent.id);
+    }
+  }, [selectedStudent]);
+
   const handleGetStudents = async () => {
     try {
       dispatch(setLoading(true));
@@ -77,13 +92,18 @@ const StudyPlanMaker: React.FC = () => {
       )}
 
       {isLoading
-        ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent mr-3" />
+        ? (
+          <div className="w-full h-full flex justify-center items-center">
+            <div className="h-10 w-10 animate-spin rounded-full border-1 border-[#00213e] border-t-transparent"></div>
+          </div>
+        )
         : testedStudents.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-1 space-y-6">
                 <PlanControls 
                   students={testedStudents}
                   onGeneratePlan={handleGeneratePlan}
+                  disabledGeneratePlan={selectedStudent !== null && plan !== null}
                 />
                 <Card className="border-border rounded-lg bg-card">
                   <CardHeader className="bg-accent/30 rounded-t-lg">
