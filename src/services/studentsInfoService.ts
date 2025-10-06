@@ -11,4 +11,12 @@ export const studentsInfoService = {
       throw error as ApiError;
     }
   },
+  getNumberOfTeachers: async () => {
+    try {
+      const response = await apiService.get<number>("/user/teachers-info");
+      return response;
+    } catch (error) {
+      throw error as ApiError;
+    }
+  }
 };

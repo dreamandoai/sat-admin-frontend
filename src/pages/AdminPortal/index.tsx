@@ -14,15 +14,22 @@ import {
   BarChart3,
   Clock,
   TrendingUp,
-  Loader2
+  Loader2,
+  UserCircle
 } from 'lucide-react';
-import { setStudentsInfo } from '../../store/studentsInfoSlice';
+import { setStudentsInfo, setNumberOfTeachers } from '../../store/studentsInfoSlice';
 import type { ApiError } from '../../types/api';
 
 const AdminPortal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { numberOfStudents, averageScore, numberOfStudyPlans } = useSelector((state: RootState) => state.studentsInfo);
+  const { 
+    numberOfStudents, 
+    averageScore, 
+    numberOfStudyPlans, 
+    numberOfTestedStudents,
+    numberOfTeachers
+  } = useSelector((state: RootState) => state.studentsInfo);
   const [ isLoading, setIsLoading ] = useState<boolean>(false);
   
 
@@ -30,6 +37,8 @@ const AdminPortal: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await studentsInfoService.getStudentsInfo();
+      const teachersResponse = await studentsInfoService.getNumberOfTeachers();
+      dispatch(setNumberOfTeachers(teachersResponse));
       dispatch(setStudentsInfo(response));
       setIsLoading(false);
     } catch (error: unknown) {
@@ -73,7 +82,7 @@ const AdminPortal: React.FC = () => {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-small text-foreground/70">
-                  {`${numberOfStudents || 0} active students`}
+                  {`${numberOfTestedStudents || 0} active students`}
                 </span>
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -178,6 +187,31 @@ const AdminPortal: React.FC = () => {
                   12 users with access
                 </span>
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card 
+            className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 bg-primary rounded-lg"
+            onClick={() => navigate('/user-directory')}
+          >
+            <CardContent className="p-8">
+              <div className="flex items-start justify-between mb-6">
+                <div className="p-4 bg-card/20 rounded-xl backdrop-blur-sm">
+                  <UserCircle className="h-8 w-8 text-foreground" />
+                </div>
+                <TrendingUp className="h-5 w-5 text-foreground/70" />
+              </div>
+              <h3 className="text-body-large font-medium text-foreground mb-3">
+                User Directory
+              </h3>
+              <p className="text-small text-foreground/80 mb-4 leading-relaxed">
+                View registered students and teachers
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-small text-foreground/70">
+                  {(numberOfTeachers || 0) + (numberOfStudents || 0)} total users
+                </span>
+                <div className="w-2 h-2 bg-highlight rounded-full"></div>
               </div>
             </CardContent>
           </Card>

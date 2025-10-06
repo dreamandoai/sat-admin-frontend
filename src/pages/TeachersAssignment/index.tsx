@@ -68,7 +68,7 @@ const TeachersAssignment: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#b2dafb' }}>
+    <div className="min-h-screen bg-[#b2dafb]">
       {/* Nav */}
       <Navbar title="Students" subtitle="Manage student assignments and view diagnostic results" />
       {/* Main Content */}

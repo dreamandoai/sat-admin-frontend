@@ -9,6 +9,7 @@ import AdminPortal from "./pages/AdminPortal";
 import PlanMaker from "./pages/PlanMaker";
 import TeachersAssignment from "./pages/TeachersAssignment";
 import Resources from "./pages/Resources";
+import UserDirectory from "./pages/UserDirectory";
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
             <Route path="/planner" element={<PlanMaker />} />
             <Route path="/students" element={<TeachersAssignment />} />
             <Route path="/resources" element={<Resources />} />
+            <Route path="/user-directory" element={<UserDirectory />} />
           </Route>
           <Route path="*" element={<Navigate to="/portal" replace />} />
         </Routes>
