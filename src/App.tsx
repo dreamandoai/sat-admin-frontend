@@ -10,6 +10,7 @@ import PlanMaker from "./pages/PlanMaker";
 import TeachersAssignment from "./pages/TeachersAssignment";
 import Resources from "./pages/Resources";
 import UserDirectory from "./pages/UserDirectory";
+import AiAccessManagement from "./pages/AiAccessManagement";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="/students" element={<TeachersAssignment />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/user-directory" element={<UserDirectory />} />
+            <Route path="/ai-access" element={<AiAccessManagement />} />
           </Route>
           <Route path="*" element={<Navigate to="/portal" replace />} />
         </Routes>

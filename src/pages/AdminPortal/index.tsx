@@ -167,7 +167,7 @@ const AdminPortal: React.FC = () => {
           </Card>
           <Card 
             className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 bg-card rounded-lg"
-            onClick={() => navigate('ai-access')}
+            onClick={() => navigate('/ai-access')}
           >
             <CardContent className="p-8">
               <div className="flex items-start justify-between mb-6">
@@ -184,7 +184,7 @@ const AdminPortal: React.FC = () => {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-small text-foreground/70">
-                  12 users with access
+                  ✨ Click to open
                 </span>
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
               </div>
@@ -263,7 +263,7 @@ const AdminPortal: React.FC = () => {
                 {isLoading ? (
                   <Loader2 className="h-8 w-8 animate-spin mx-auto" />
                 ) : (
-                  averageScore || 0
+                  Math.round(averageScore || 0)
                 )}
               </p>
             </CardContent>

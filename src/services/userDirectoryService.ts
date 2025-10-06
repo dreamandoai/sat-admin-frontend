@@ -1,6 +1,6 @@
 import { apiService } from './api';
 import type { ApiError } from '../types/api';
-import type { RegisteredStudent, RegisteredTeacher } from '../types/userDirectory';
+import type { RegisteredStudent, RegisteredTeacher, UserAiAccessRequest } from '../types/userDirectory';
 
 export const userDirectoryService = {
   getRegisteredTeachers: async () => {
@@ -14,6 +14,14 @@ export const userDirectoryService = {
   getRegisteredStudents: async () => {
     try {
       const response = await apiService.get<RegisteredStudent[]>("/user/students");
+      return response;
+    } catch (error) {
+      throw error as ApiError;
+    }
+  },
+  setUserAiAccess: async (users: UserAiAccessRequest[]) => {
+    try {
+      const response = await apiService.post("/user/set-ai-access", users);
       return response;
     } catch (error) {
       throw error as ApiError;
