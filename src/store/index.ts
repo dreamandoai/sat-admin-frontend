@@ -4,6 +4,7 @@ import planReducer from "./planSlice";
 import pairReducer from "./pairSlice";
 import studentsInfoReducer from "./studentsInfoSlice";
 import resourceReducer from "./resourceSlice";
+import userDirectoryReducer from "./userDirectorySlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     pair: pairReducer,
     studentsInfo: studentsInfoReducer,
     resource: resourceReducer,
+    userDirectory: userDirectoryReducer
   }
 });
 
